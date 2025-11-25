@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Fabulous Newsletter Builder</title>
+  <style>
+    :root{--bg:#0b1220;--card:#071026;--accent:#ff6bcb;--muted:rgba(255,255,255,.65)}
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Arial;color:#eaf2ff;background:linear-gradient(180deg,#031026 0%,#071028 100%);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
+    .wrap{width:100%;max-width:1100px;display:grid;grid-template-columns:420px 1fr;gap:18px}
+    .card{background:linear-gradient(180deg,rgba(255,255,255,.02),rgba(255,255,255,.01));padding:16px;border-radius:12px;border:1px solid rgba(255,255,255,.03);box-shadow:0 10px 30px rgba(2,6,23,.6)}
+    h1{font-size:16px;margin:0 0 8px}
+    label{display:block;font-size:13px;margin:10px 0 6px;color:var(--muted)}
+    input[type=text],textarea{width:100%;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,.04);background:transparent;color:inherit;font-family:monospace;font-size:13px}
+    textarea{min-height:84px;resize:vertical}
+    .controls{display:flex;gap:8px;align-items:center;margin-top:12px}
+    button{background:linear-gradient(90deg,#ff6bcb,#7c3aed);border:none;padding:8px 12px;border-radius:10px;color:white;font-weight:600;cursor:pointer}
+    button.ghost{background:transparent;border:1px solid rgba(255,255,255,.06);color:var(--muted)}
+    .preview{min-height:520px;overflow:hidden}
+    .preview iframe{width:100%;height:100%;border:0;border-radius:10px;background:white}
+    .meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;color:var(--muted);font-size:13px}
+    @media (max-width:980px){.wrap{grid-template-columns:1fr}.preview{min-height:420px}}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <div class="meta">
+        <div>Fabulous Newsletter</div>
+        <div>Quick — editable HTML/CSS/JS</div>
+      </div>
+      <h1>Build a short newsletter</h1>
+      <label for="subject">Subject</label>
+      <input id="subject" type="text" value="This Week: Tiny Wins & Big Ideas" />
+
+      <label for="html">HTML</label>
+      <textarea id="html">&lt;table width="100%" cellpadding="0" cellspacing="0" role="presentation"&gt;
+  &lt;tr&gt;&lt;td style="padding:18px;background:#ffffff;border-radius:8px;"&gt;
+    &lt;h2 style="margin:0 0 8px;font-family:system-ui;"&gt;💫 Tiny Wins&lt;/h2&gt;
+    &lt;p style="margin:0 0 12px;color:#334155;"&gt;A short note on progress: celebrate the small steps — they add up.&lt;/p&gt;
+    &lt;a href="#" style="display:inline-block;padding:8px 12px;border-radius:6px;text-decoration:none;background:#7c3aed;color:#fff;font-weight:600;"&gt;Read more&lt;/a&gt;
+  &lt;/td&gt;&lt;/tr&gt;
+&lt;/table&gt;</textarea>
+
+      <label for="css">CSS (scoped for preview)</label>
+      <textarea id="css">body{font-family:system-ui,Segoe UI,Roboto,Arial;margin:0;padding:20px;background:#f6f9ff}
+h2{color:#0f172a}
+p{color:#475569;line-height:1.4}
+a{color:#7c3aed}</textarea>
+
+      <label for="js">JavaScript (optional)</label>
+      <textarea id="js">// Example: show an alert when clicking the CTA
+document.addEventListener('click', function(e){if(e.target.matches('a')){e.preventDefault(); alert('Thanks for clicking the newsletter CTA!');}});</textarea>
+
+      <div class="controls">
+        <button id="run">Preview</button>
+        <button id="download" class="ghost">Download .html</button>
+        <button id="reset" class="ghost">Reset</button>
+      </div>
+    </div>
+
+    <div class="card preview">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <div>
+          <strong id="previewSubject">This Week: Tiny Wins & Big Ideas</strong>
+          <div style="font-size:12px;color:var(--muted)">Newsletter preview</div>
+        </div>
+        <div style="font-size:12px;color:var(--muted)">Rendered</div>
+      </div>
+      <iframe id="preview" sandbox="allow-scripts allow-same-origin"></iframe>
+    </div>
+  </div>
+
+  <script>
+    const $ = id => document.getElementById(id);
+    const subject = $('subject'), htmlEl = $('html'), cssEl = $('css'), jsEl = $('js');
+    const preview = $('preview'), runBtn = $('run'), dlBtn = $('download'), resetBtn = $('reset'), previewSubject = $('previewSubject');
+
+    const sampleHTML = htmlEl.value;
+    const sampleCSS = cssEl.value;
+    const sampleJS = jsEl.value;
+
+    function buildDoc(){
+      return `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>body{margin:0;padding:24px;background:#f3f6ff} .container{max-width:600px;margin:0 auto} ${cssEl.value}</style></head><body><div class="container">${htmlEl.value}</div><script>${jsEl.value}<\/script></body></html>`;
+    }
+
+    function updatePreview(){
+      previewSubject.textContent = subject.value || 'Newsletter';
+      const doc = buildDoc();
+      const iframeDoc = preview.contentWindow.document;
+      iframeDoc.open(); iframeDoc.write(doc); iframeDoc.close();
+    }
+
+    // initial render
+    updatePreview();
+
+    let t;
+    [subject, htmlEl, cssEl, jsEl].forEach(el => el.addEventListener('input', ()=>{clearTimeout(t); t=setTimeout(updatePreview,300);}));
+
+    runBtn.addEventListener('click', updatePreview);
+
+    dlBtn.addEventListener('click', ()=>{
+      const blob = new Blob([buildDoc()], {type:'text/html'});
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = (subject.value || 'newsletter') + '.html';
+      a.click();
+      URL.revokeObjectURL(a.href);
+    });
+
+    resetBtn.addEventListener('click', ()=>{
+      subject.value = 'This Week: Tiny Wins & Big Ideas';
+      htmlEl.value = sampleHTML; cssEl.value = sampleCSS; jsEl.value = sampleJS;
+      updatePreview();
+    });
+  </script>
+</body>
+</html>
