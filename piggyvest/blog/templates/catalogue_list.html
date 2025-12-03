@@ -1,0 +1,19 @@
+<h1>List</h1>
+<a href="{% url 'catalogue_create' %}">Add New Catalogue</a>
+
+{% if catalogues %}
+    <ul>
+    {% for catalogue in catalogues %}
+        <li>
+            {{ catalogue.name }} - {{ catalogue.telephone }} - {{ catalogue.address }} - {{ catalogue.email }}
+            <a href="{% url 'catalogue_update' catalogue.pk %}">Edit</a>
+            <form action="{% url 'catalogue_delete' catalogue.pk %}" method="post" style="display:inline;">
+                {% csrf_token %}
+                <button type="submit">Delete</button>
+            </form>
+        </li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No Catalogues found.</p>
+{% endif %}

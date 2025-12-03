@@ -13,7 +13,13 @@ class Book(models.Model):
     title = models.CharField(max_length=200)
     author = models.ForeignKey(Author, on_delete=models.CASCADE)
     publication_date = models.DateField()
-    isbn = models.Charfield(max_length=13, unique=True)
+    isbn = models.CharField(max_length=13, unique=True)
 
     def __str__(self):
         return self.title
+    
+
+
+
+
+
