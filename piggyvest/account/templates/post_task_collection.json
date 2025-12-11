@@ -1,0 +1,83 @@
+{
+  "info": {
+    "name": "Task API - Create Task Only",
+    "_postman_id": "77c19b1b-55d8-4dc6-b777-post-task-collection",
+    "description": "Postman collection for logging in and creating a Task with text/audio/attachment using JWT authentication.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1️⃣ Login (Get JWT Access Token)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"username\": \"alex\",\n  \"password\": \"1234\"\n}"
+        },
+        "url": {
+          "raw": "http://127.0.0.1:8000/account/login/",
+          "protocol": "http",
+          "host": ["127", "0", "0", "1"],
+          "port": "8000",
+          "path": ["account", "login", ""]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "2️⃣ Create Task (Authenticated POST)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{access_token}}",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "text",
+              "value": "My first task created from Postman",
+              "type": "text"
+            },
+            {
+              "key": "audio",
+              "type": "file",
+              "src": "",
+              "description": "Upload an audio file (mp3, wav, ogg)"
+            },
+            {
+              "key": "attachment",
+              "type": "file",
+              "src": "",
+              "description": "Upload attachment (pdf, png, jpeg, txt)"
+            }
+          ]
+        },
+        "url": {
+          "raw": "http://127.0.0.1:8000/api/tasks/",
+          "protocol": "http",
+          "host": ["127", "0", "0", "1"],
+          "port": "8000",
+          "path": ["api", "tasks", ""]
+        }
+      },
+      "response": []
+    }
+  ],
+  "variable": [
+    {
+      "key": "access_token",
+      "value": ""
+    }
+  ]
+}

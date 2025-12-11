@@ -3,7 +3,8 @@ from django.urls import path, include
 from . import views
 from django.contrib import admin
 from rest_framework.routers import DefaultRouter
-from .views import MyModelViewSet
+from .views import MyModelViewSet, TaskViewSet
+from django.conf.urls.static import static
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
@@ -13,7 +14,10 @@ from rest_framework_simplejwt.views import (
 from .views import TestJWT, RegisterView, CustomLoginView
 
 router = DefaultRouter()
-router.register(r'mymodels', MyModelViewSet)
+router.register(r'mymodels', MyModelViewSet,basename='mymodel')
+router.register(r'tasks', TaskViewSet, basename='task')
+
+
 
 
 urlpatterns = [
@@ -26,6 +30,7 @@ urlpatterns = [
     path('login/', views.CustomLoginView.as_view(), name='login'),
     path('registration/', include('django.contrib.auth.urls')), # Built-in auth URLs
     path('api/', include(router.urls)),
+    path('', include(router.urls)),
      # Signup
     path('signup/', RegisterView.as_view(), name='signup'),
 
@@ -34,3 +39,5 @@ urlpatterns = [
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('api/test/', TestJWT.as_view(), name='test_jwt'),
 ]
+
+

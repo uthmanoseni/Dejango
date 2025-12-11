@@ -1,17 +1,30 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, authenticate, logout
 from .forms import SignupForm, LoginForm
-from rest_framework import viewsets
-from .models import MyModel
+from .models import MyModel, Task
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
 from .serializers import MyModelSerializer
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework import status
-from .serializers import RegisterSerializer
+from .serializers import RegisterSerializer,  TaskSerializer
 from rest_framework.permissions import AllowAny
 from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework import viewsets, permissions
+from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
+from .permissions import IsOwnerOrReadOnly
+
+class TaskViewSet(viewsets.ModelViewSet):
+    queryset = Task.objects.all().order_by('-created_at')
+    serializer_class = TaskSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
+    parser_classes = [MultiPartParser, FormParser, JSONParser]
+
+    def perform_create(self, serializer):
+        serializer.save()
 
 
 
@@ -90,15 +103,18 @@ class RegisterView(generics.CreateAPIView):
     
 
 
-
+@method_decorator(csrf_exempt, name='dispatch')
 class CustomLoginView(APIView):
+    authentication_classes = []  # VERY IMPORTANT
+    permission_classes = []       # NO Auth Required
+
     def post(self, request):
         username = request.data.get("username")
         password = request.data.get("password")
 
         if username is None or password is None:
             return Response(
-                {"detail": "Username and password required."},
+                {"detail": "Username and password are required."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
